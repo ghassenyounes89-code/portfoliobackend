@@ -12,7 +12,11 @@ import Comment from "./models/Comment.js";
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+
+app.use(cors({ 
+  origin: [process.env.FRONTEND_URL, "https://younesdev-portfolio.netlify.app"],
+  credentials: true 
+}));
 app.use(express.json());
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
@@ -34,11 +38,12 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Admin Middleware
+// Admin Middleware - الإصدار المصحح
 const authenticateAdmin = (req, res, next) => {
-  // This is a simple admin check - in production you'd want a more secure method
-  const adminToken = req.headers['authorization'];
-  if (adminToken && adminToken === 'Bearer admin-token') {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (token === "true") {
     next();
   } else {
     res.status(401).json({ message: "Admin access required" });
